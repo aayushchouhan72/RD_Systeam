@@ -1,11 +1,15 @@
 import bcrypt, { genSalt } from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import dotenv, { config } from "dotenv";
 
 import pool from "../config/sql_connetdb.js";
 import { isStrongPassword } from "../lib/passwordStrength.js";
 import { generateToken } from "../lib/tokenGenrator.js";
 import { sendMail } from "../config/sendVerificationEmail.js";
+import { link } from "fs";
+
+dotenv.config();
 
 export const login = async (req, res) => {
   //  destructure body
@@ -103,13 +107,21 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hassedPassword = await bcrypt.hash(password, salt);
 
+    //  Email verification token
+    const emailVerficationToken = crypto.randomBytes(32).toString("hex");
+
     //now save to db
     const response = await pool.query(
-      "INSERT INTO users(name,password,phone,email) VALUES ($1,$2,$3,$4) RETURNING name,password,phone,email",
-      [name, hassedPassword, phone, email]
+      "INSERT INTO users(name,password,phone,email,email_token) VALUES ($1,$2,$3,$4,$5) RETURNING name,password,phone,email,email_token",
+      [name, hassedPassword, phone, email, emailVerficationToken]
     );
+
     //  SET COOKIES
     generateToken(response.rows[0], res);
+
+    //  Email verification from here
+    const link = `${process.env.BASE_URL}/api/auth/verify/${emailVerficationToken}`;
+    await sendMail(link, email);
 
     //  Get data with out password
     const userResult = await pool.query(
@@ -164,4 +176,33 @@ export const check = async (req, res) => {
     console.error(error.message);
   }
 };
-export const verifyEmail = async (res, req) => {};
+export const verifyEmail = async (req, res) => {
+  try {
+    //  Get token from params
+    const { token } = req.params;
+
+    //  now get token  search token in db
+    const result = await pool.query(
+      `
+         UPDATE users
+         SET is_verified = true,
+         email_token = NULL
+         WHERE email_token = $1
+         RETURNING email, is_verified
+        `,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).send("Invalid or expired token");
+    }
+    res.json({
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    console.log(
+      "Internal server error in verify mail contoller",
+      error.message
+    );
+  }
+};
