@@ -1,0 +1,31 @@
+
+|||||||||||||||||||||||||||||||||||||||||||||***Rules and Conditions***:||||||||||||||||||||||||||||||||||
+
+The RD amount must be deposited every month in full and on time.
+
+The RD amount can be deposited monthly; however, the installment amount should not be less than the prescribed minimum.
+
+Once an RD account is opened, it cannot be closed midway. If it is closed early, interest will be calculated at a rate lower by 0.5% than the applicable rate.
+
+According to your financial capacity, you can open one or more RD accounts. The RD account can be opened in the name of an individual or jointly.
+
+Loan facility is available against the RD account.
+
+RD amount ₹1000 – Loan up to ₹20,000
+
+RD amount ₹2000 – Loan up to ₹20,000
+
+RD amount ₹3000 – Loan from ₹30,000 to ₹40,000
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||  DATABASE ||||||||||||||||||||||||||||||||||||||||||||||||
+Currintly  postgress database has 3 tables 
+1.users
+2.RDusers
+3.RDpassbook
+
+fileds of this DB are 
+Table  user  has this fileds ---> it hase 4 fields name , password ,phone,email
+Table  RDuser  has this fileds ---> fullname,adharno,rdamount,photourl,dob,rdstartdate,panno,rdaccountno,occupation;
+Table  RDpassbook has this fileds ---->rduser_id,depoamt,lateday,fineamount,depositdate 
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   ServerSide details ||||||||||||||||||||||||||||||||||||||||
