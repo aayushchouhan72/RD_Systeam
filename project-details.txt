@@ -25,7 +25,21 @@ Currintly  postgress database has 3 tables
 
 fileds of this DB are 
 Table  user  has this fileds ---> it hase 4 fields name , password ,phone,email
-Table  RDuser  has this fileds ---> fullname,adharno,rdamount,photourl,dob,rdstartdate,panno,rdaccountno,occupation;
+Table  RDuser  has this fileds ---> fullname,adharno,rdamount,photourl,dob,rdstartdate,panno,occupation,nomenee_id; ---> server genrates unique id for users accout number 
 Table  RDpassbook has this fileds ---->rduser_id,depoamt,lateday,fineamount,depositdate 
+Table  nominee has fields ---> name ,address,panno,addharno
 
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   ServerSide details ||||||||||||||||||||||||||||||||||||||||
+
+
+the fields are require for register user  for rd 
+ fullname,
+      adharno,
+      rdamount,
+      photourl,
+      dob,
+      rdstartdate,
+      panno,
+      occupation
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||      

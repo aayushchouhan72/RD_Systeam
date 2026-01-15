@@ -1,9 +1,7 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
 
 import { verificationEmailTemplate } from "../utils/verificationpage.js";
 
-dotenv.config();
 export const sendMail = async (link, email) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
