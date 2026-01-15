@@ -5,7 +5,7 @@ import crypto from "crypto";
 import pool from "../config/sql_connetdb.js";
 import { isStrongPassword } from "../lib/passwordStrength.js";
 import { generateToken } from "../lib/tokenGenrator.js";
-import { sendMail } from "../config/sendVerificationEmail.js";
+import { sendMail } from "../utils/sendVerificationEmail.js";
 
 //  Login Logic
 
