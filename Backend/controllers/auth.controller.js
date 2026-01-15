@@ -1,15 +1,13 @@
 import bcrypt, { genSalt } from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import dotenv, { config } from "dotenv";
 
 import pool from "../config/sql_connetdb.js";
 import { isStrongPassword } from "../lib/passwordStrength.js";
 import { generateToken } from "../lib/tokenGenrator.js";
 import { sendMail } from "../config/sendVerificationEmail.js";
-import { link } from "fs";
 
-dotenv.config();
+//  Login Logic
 
 export const login = async (req, res) => {
   //  destructure body
@@ -51,6 +49,8 @@ export const login = async (req, res) => {
     .status(201)
     .json({ message: "Logged In successfully", data: user.rows[0] });
 };
+
+//  Signup
 export const signup = async (req, res) => {
   try {
     const { name, password, email, phone } = req.body;
@@ -138,6 +138,8 @@ export const signup = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//  Logout
 export const logout = async (req, res) => {
   try {
     res
@@ -155,6 +157,8 @@ export const logout = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//  Check is authenticated or not
 export const check = async (req, res) => {
   try {
     const token = req.cookies.jwt;
@@ -176,6 +180,8 @@ export const check = async (req, res) => {
     console.error(error.message);
   }
 };
+
+//  Email verify
 export const verifyEmail = async (req, res) => {
   try {
     //  Get token from params
