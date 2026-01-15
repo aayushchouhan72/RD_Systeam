@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-import { verificationEmailTemplate } from "../utils/verificationpage.js";
+import { verificationEmailTemplate } from "./verificationpage.js";
 
 export const sendMail = async (link, email) => {
   const transporter = nodemailer.createTransport({

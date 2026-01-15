@@ -1,5 +1,6 @@
 import pool from "../config/sql_connetdb.js";
 import generateAccountNumber from "../lib/rdAccountNumberGenrate.js";
+import { check } from "./auth.controller.js";
 
 //  Register user for RD
 export const registerUser = async (req, res) => {
@@ -128,4 +129,24 @@ export const addNomine = async (req, res) => {
   }
 };
 
-//
+// Start Rd
+export const startRd = async (req, res) => {
+  //  Get Account number form params
+  const { account_number, user } = req.params;
+  const { rdamount, rdstartdate, rddepositdate, rdmonth } = req.body;
+
+  //  Check all field Shouldbe feild
+
+  if (!rdamount || !rdstartdate || !rddepositdate || !rdmonth)
+    res.status(400).json({ message: "All field should be required" });
+
+  // Insert into DB
+  const saveToDb = await pool.query(
+    "Insert into rd_passbook  (rdamount,rduserid,rdstartdate, rddepositdate, rdmonth) values ($1,$2,$3,$4,$5) RETURNING id ",
+    [rdamount, rduserid, rdstartdate, rddepositdate, rdmonth]
+  );
+
+  //  Check data is Inserted or not in db
+  if (!(saveToDb.rowCount > 0)) {
+  }
+};
