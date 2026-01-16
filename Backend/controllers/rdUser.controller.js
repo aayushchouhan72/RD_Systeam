@@ -148,5 +148,10 @@ export const startRd = async (req, res) => {
 
   //  Check data is Inserted or not in db
   if (!(saveToDb.rowCount > 0)) {
+    res.status(500).json("Probleam in backend to insert data in db");
   }
+
+  //  final Respone whene all things are fine
+
+  res.status(200).json({ message: "user is register sucesfully rd " });
 };
