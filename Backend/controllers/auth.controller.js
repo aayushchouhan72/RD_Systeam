@@ -1,53 +1,52 @@
-import bcrypt, { genSalt } from "bcrypt";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import pool from "../config/sql_connetdb.js";
 import { isStrongPassword } from "../lib/passwordStrength.js";
-import { generateToken } from "../lib/tokenGenrator.js";
+import generateToken from "../lib/tokenGenrator.js";
 import { sendMail } from "../utils/sendVerificationEmail.js";
 
 //  Login Logic
-
 export const login = async (req, res) => {
-  //  destructure body
-  const { email, phone, password } = req.body;
+  try {
+    const { email, phone, password } = req.body;
 
-  //  Check Empty fileds or not
-  if (!email || !phone || !password) {
-    res.status(400).json({
-      message: "All Field should be field",
+    // ✅ email OR phone + password
+    if ((!email && !phone) || !password) {
+      return res.status(400).json({
+        message: "Email or phone and password required",
+      });
+    }
+
+    const result = await pool.query(
+      "SELECT name, phone, email, password FROM users WHERE phone=$1 OR email=$2",
+      [phone || null, email || null]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: "User not found",
+      });
+    }
+
+    const user = result.rows[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    return generateToken(user, res);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error",
     });
   }
-  // Get hassed passward from backend
-  let hassedpass = await pool.query(
-    "SELECT password FROM users WHERE phone=$1 or email=$2 ",
-    [phone, email]
-  );
-  hassedpass = hassedpass.rows[0].password;
-
-  //  now comapre hassed password with genral password
-
-  const isMatch = await bcrypt.compare(password, hassedpass);
-
-  if (!isMatch) {
-    //  if not match respone
-    res.status(400).json({
-      message: "Invalid user name password",
-    });
-
-    return;
-  }
-
-  //   if matched then genrate token and set it as cookie
-  const user = await pool.query(
-    "SELECT name,phone,email FROM users WHERE email=$1 ",
-    [email]
-  );
-  generateToken(user.rows[0], res);
-  res
-    .status(201)
-    .json({ message: "Logged In successfully", data: user.rows[0] });
 };
 
 //  Signup
@@ -161,7 +160,7 @@ export const logout = async (req, res) => {
 //  Check is authenticated or not
 export const check = async (req, res) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies.tok;
 
     //  check token is present or not
     if (!token) {
@@ -170,10 +169,12 @@ export const check = async (req, res) => {
       });
     }
     const decode = jwt.verify(token, process.env.JWT_SECRET);
+
     const findUser = await pool.query(
       "SELECT name,phone,email FROM users where email=$1",
       [decode.email]
     );
+    // console.log(findUser);
     res.status(200).json({ data: findUser.rows[0], message: "User has token" });
   } catch (error) {
     res.status(500).json({ error: error.message });
